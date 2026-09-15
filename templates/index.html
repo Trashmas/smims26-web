@@ -7,5 +7,25 @@
 </head>
 <body>
 	<h1>Sei gegrüßt, Genosse</h1>
+	<p>
+		Diese Seite ist <a href="https://github.com/axoking/smims26-web">Open-Source</a>
+	</p>
+
+	<h2>Aktuelle Nachricht</h2>
+	<p>
+		<b>Aktuelle Nachricht: </b>{{state_text}}
+	</p>
+	{% if can_change %}
+	<form action="/changetext" method="post">
+		<input type="text" name="text" placeholder="Neue Nachricht" />
+		<button>Ändern</button>
+	</form>
+
+	{% else %}
+	<p>
+		Die Nachricht kann wieder in {{minutes_next_change}} Minuten geändert werden.
+	</p>
+	{% endif %}
+
 </body>
 </html>
