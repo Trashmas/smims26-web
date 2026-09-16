@@ -1,4 +1,5 @@
 import time, redis
+from os import environ
 
 _key_state_text = "state_text_value"
 _key_last_change = "state_text_last_change"
