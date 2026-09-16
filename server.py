@@ -37,6 +37,12 @@ def index():
 
 @app.route("/changetext", methods = ["POST"])
 def change_text():
+	words = request.form["text"].lower().split(" ")
+	if "fdp" in words:
+		return "Die FDP ist hier verboten! Wir haben Mitarbeiter zu deinem Haus geschickt die dich beseitigen werden"
+	elif "afd" in words:
+		return "Das hier ist Münster!!! So eine blaue Scheiße wollen wir hier nicht"
+
 	if minutes_since_last_change() >= cooldown_minutes and len(request.form["text"]) > 1:
 		kv_bridge.set_text_and_update_time(request.form["text"])
 	
