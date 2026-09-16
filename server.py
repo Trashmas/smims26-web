@@ -2,32 +2,31 @@ from flask import Flask, render_template, request, redirect
 import time
 from math import floor
 from os import environ
+import kv_redis
+import kv_dummy
 import redis
 
 app = Flask(__name__)
 
-rd = redis.from_url(environ["KV_URL"])
+default_text = "Griechischer Wein ist so wie das Blut der Erde"
+
+if "KV_URL" in environ:
+	kv_bridge = kv_redis.Bridge(default_text)
+else:
+	print("Using dummy KV")
+	kv_bridge = kv_dummy.Bridge(default_text)
+
 cooldown_minutes = 5
 
 def minutes_since_last_change():
 	now = time.time()
-	result = rd.get("state_text_last_change")
-	if result is None:
-		rd.set("state_text_last_change", "0.0")
-		last_change = 0.0
-	else:
-		last_change = float(result.decode())
+	last_change = kv_bridge.get_last_change()
 	return floor((now - last_change) / 60)
 
 @app.route("/")
 def index():
 	minutes_elapsed = minutes_since_last_change()
-	result = rd.get("state_text_value")
-	if result is None:
-		state_text = "Griechischer Wein ist so wie das Blut der Erde"
-		rd.set("state_text_value", state_text)
-	else:
-		state_text = result.decode()
+	state_text = kv_bridge.get_text()
 
 	return render_template(
 		"index.html",
@@ -38,9 +37,8 @@ def index():
 
 @app.route("/changetext", methods = ["POST"])
 def change_text():
-	if minutes_since_last_change() >= cooldown_minutes:
-		rd.set("state_text_value", request.form["text"])
-		rd.set("state_text_last_change", str(time.time()))
+	if minutes_since_last_change() >= cooldown_minutes and len(request.form["text"]) > 1:
+		kv_bridge.set_text_and_update_time(request.form["text"])
 	
 	return redirect("/")
 
