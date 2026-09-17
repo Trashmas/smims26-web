@@ -8,6 +8,11 @@ import redis
 
 app = Flask(__name__)
 
+if "KARL_MAIL" in environ:
+	karl_mail = environ["KARL_MAIL"]
+else:
+	karl_mail = "karl@marx.com"
+
 default_text = "Griechischer Wein ist so wie das Blut der Erde"
 
 if "KV_URL" in environ:
@@ -24,19 +29,26 @@ def minutes_since_last_change():
 	return floor((now - last_change) / 60)
 
 @app.route("/")
-def fuck():
-	return "Diese Webseite wurde vorübergehend von Vater Staat lahmgelegt. Bitte habt Geduld Genossen."
-
-@app.route("/ljkadsjflkadsjfklasdjfklasdjf")
 def index():
-	minutes_elapsed = minutes_since_last_change()
-	state_text = kv_bridge.get_text()
+	return render_template("index.html")
+
+@app.route("/newsletter", methods=["POST"])
+def newsletter_signup():
+	if request.form["email"] == karl_mail:
+		return redirect("/karl_marx_very_secret_page")
+
+	return "Ein unerwarteter Fehler ist aufgetreten!!"
+
+@app.route("/karl_marx_very_secret_page")
+def secret_page():
+	minutes_to_wait = cooldown_minutes - minutes_since_last_change()
+	can_change = minutes_to_wait <= 0
 
 	return render_template(
-		"index.html",
-		state_text = state_text,
-		minutes_next_change = cooldown_minutes - minutes_elapsed,
-		can_change = minutes_elapsed >= cooldown_minutes
+		"secret.html",
+		state_text = kv_bridge.get_text(),
+		can_change = can_change,
+		minutes_next_change = minutes_to_wait
 	)
 
 @app.route("/changetext", methods = ["POST"])
@@ -50,7 +62,7 @@ def change_text():
 	if minutes_since_last_change() >= cooldown_minutes and len(request.form["text"]) > 1:
 		kv_bridge.set_text_and_update_time(request.form["text"])
 	
-	return redirect("/")
+	return redirect("/karl_marx_very_secret_page")
 
 if __name__ == "__main__":
 	app.run(port = 1234, debug = True)
