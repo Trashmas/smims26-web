@@ -48,7 +48,8 @@ def secret_page():
 		"secret.html",
 		state_text = kv_bridge.get_text(),
 		can_change = can_change,
-		minutes_next_change = minutes_to_wait
+		minutes_next_change = minutes_to_wait,
+		history = kv_bridge.get_history()
 	)
 
 @app.route("/changetext", methods = ["POST"])

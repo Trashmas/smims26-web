@@ -14,3 +14,6 @@ class Bridge:
 	def set_text_and_update_time(self, text):
 		self.current_text = text
 		self.last_changed = time.time()
+
+	def get_history(self):
+		return ["test", "hallo", "123"]
