@@ -24,6 +24,10 @@ def minutes_since_last_change():
 	return floor((now - last_change) / 60)
 
 @app.route("/")
+def fuck():
+	return "Diese Webseite wurde vorübergehend von Vater Staat lahmgelegt. Bitte habt Geduld Genossen."
+
+@app.route("/ljkadsjflkadsjfklasdjfklasdjf")
 def index():
 	minutes_elapsed = minutes_since_last_change()
 	state_text = kv_bridge.get_text()
