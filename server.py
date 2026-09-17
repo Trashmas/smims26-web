@@ -37,27 +37,29 @@ def newsletter_signup():
 	if request.form["email"] == karl_mail:
 		return redirect("/karl_marx_very_secret_page")
 
-	return "Ein unerwarteter Fehler ist aufgetreten!!"
+	return "Ein sehr unerwarteter Fehler ist aufgetreten!!"
 
 @app.route("/karl_marx_very_secret_page")
 def secret_page():
 	minutes_to_wait = cooldown_minutes - minutes_since_last_change()
 	can_change = minutes_to_wait <= 0
+	history = kv_bridge.get_history()
+	history.reverse()
 
 	return render_template(
 		"secret.html",
 		state_text = kv_bridge.get_text(),
 		can_change = can_change,
 		minutes_next_change = minutes_to_wait,
-		history = kv_bridge.get_history()
+		history = history
 	)
 
 @app.route("/changetext", methods = ["POST"])
 def change_text():
-	words = request.form["text"].lower().split(" ")
-	if "fdp" in words:
-		return "Die FDP ist hier verboten! Wir haben Mitarbeiter zu deinem Haus geschickt die dich beseitigen werden"
-	elif "afd" in words:
+	text = request.form["text"].lower()
+	if "fdp" in text:
+		return "Die FDP ist hier unerwünscht! Wir haben Mitarbeiter zu deinem Haus geschickt die dich beseitigen werden"
+	elif "afd" in text:
 		return "Das hier ist Münster!!! So eine blaue Scheiße wollen wir hier nicht"
 
 	if minutes_since_last_change() >= cooldown_minutes and len(request.form["text"]) > 1:
