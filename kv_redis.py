@@ -29,7 +29,7 @@ class Bridge:
 		now = datetime.now()
 		dt = now.strftime("%d.%m.%Y, %H:%M")
 		history = self.rd.get(_key_history).decode()
-		history += f"[{d}] {text}\n"
+		history += f"[{dt}] {text}\n"
 		self.rd.set(_key_history, history)
 
 	def get_history(self):
