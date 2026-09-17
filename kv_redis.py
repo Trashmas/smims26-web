@@ -13,6 +13,8 @@ class Bridge:
 			self.rd.set(_key_state_text, default_text)
 		if self.rd.get(_key_last_change) is None:
 			self.rd.set(_key_last_change, "0.0")
+		if self.rd.get(_key_history) is None:
+			self.rd.set(_key_history, "")
 	
 	def get_text(self):
 		return self.rd.get(_key_state_text).decode()
